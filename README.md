@@ -1,0 +1,1 @@
+I am using this repository to pull data from JIRA and GitHub and then prepare data to build some charts describing team flow, like cumulative flow diagram, cycle times etc.
