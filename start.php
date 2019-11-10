@@ -1,6 +1,7 @@
 <?php
 
 $importJira = false;
+$importGithub = false;
 
 require 'vendor/autoload.php';
 require_once 'settings.php';
@@ -18,6 +19,10 @@ try {
         $summary = $backuper->backup($list);
 
         echo (string) $summary . PHP_EOL;
+    }
+
+    if ($importGithub === true) {
+        //todo
     }
 
 } catch (\Throwable $e) {

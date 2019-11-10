@@ -7,3 +7,4 @@ $credentials = [
 ];
 
 $importJira = false;
+$importGithub = false;
