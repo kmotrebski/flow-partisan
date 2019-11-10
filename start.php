@@ -1,9 +1,11 @@
 <?php
 
 require 'vendor/autoload.php';
-require_once 'credentials.php';
+require_once 'settings.php';
 
 try {
+
+
 
     $jiraRepo = new \KoFlow\JiraRepository($credentials);
     $storage = new \KoFlow\LocalStorage('/var/ko_flow/storage/pt');

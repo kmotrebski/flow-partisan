@@ -2,4 +2,4 @@
 vendor
 storage
 tmp
-credentials.php
+settings.php
