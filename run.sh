@@ -3,8 +3,6 @@ set -e
 
 clear
 
-
-
 docker run \
     --volume $(pwd):/var/ko_flow \
     --name ko_flow \

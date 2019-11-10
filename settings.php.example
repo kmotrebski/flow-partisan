@@ -5,3 +5,5 @@ $credentials = [
     'jiraUser' => 'name@your_domain.com',
     'jiraPassword' => 'api_key',
 ];
+
+$importJira = false;
