@@ -6,5 +6,9 @@ $credentials = [
     'jiraPassword' => 'api_key',
 ];
 
+$githubToken = 'token_secret';
+$githubUser = 'user_or_organization';
+$githubRepository = 'repository_name';
+
 $importJira = false;
 $importGithub = false;
