@@ -24,11 +24,12 @@ class Backuper
         $this->localStorage = $localStorage;
     }
 
-    public function backup()
+    public function backup(int $fromPage, int $toPage)
     {
-        $page = 1;
+        $page = $fromPage;
 
         while (true) {
+
             $prs = $this->githubRepository->getPullRequestsForPage($page);
 
             if (count($prs) === 0) {
@@ -39,9 +40,18 @@ class Backuper
 
             $page++;
 
-            if ($page > 3) {
+            $this->outputQuota();
+
+            if ($toPage < $page) {
                 return;
             }
         }
+    }
+
+    private function outputQuota(): void
+    {
+        $quota = $this->githubRepository->getQuota();
+        $asJson = json_encode($quota);
+        echo $asJson . PHP_EOL;
     }
 }

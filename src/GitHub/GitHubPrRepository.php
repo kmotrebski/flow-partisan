@@ -117,4 +117,21 @@ class GitHubPrRepository
 
         return $eventsPaginated;
     }
+
+    public function getQuota(): \stdClass
+    {
+        /** @var \Github\Api\RateLimit\RateLimitResource[] $rateLimits */
+        $rateLimits = $this->client->api('rate_limit')->getResource('core');
+
+        $output = [
+            'limit' => $rateLimits->getLimit(),
+            'remaining' => $rateLimits->getRemaining(),
+        ];
+
+        $reset = $rateLimits->getReset();
+        $now = time();
+        $output['tillReset'] = $reset - $now;
+
+        return (object) $output;
+    }
 }

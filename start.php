@@ -41,10 +41,11 @@ try {
             $githubUser,
             $githubRepository
         );
+
         $prStorage = new \KoFlow\GitHub\LocalStorage('/var/ko_flow/storage/github');
 
         $backuper = new \KoFlow\GitHub\Backuper($prRepo, $prStorage);
-        $backuper->backup();
+        $backuper->backup(1, 3);
 
         exit(0);
     }
