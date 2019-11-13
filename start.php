@@ -6,6 +6,8 @@ set_error_handler(function ($severity, $message, $file, $line) {
 
 $importJira = false;
 $importGithub = false;
+$analyzeGitHub = false;
+
 $githubToken = null;
 $githubUser = null;
 $githubRepository = null;
@@ -33,21 +35,29 @@ try {
     }
 
     if ($importGithub === true) {
-        //todo
 
         $prRepo = new \KoFlow\GitHub\GitHubPrRepository(
             $githubToken,
             $githubUser,
             $githubRepository
         );
-
         $prStorage = new \KoFlow\GitHub\LocalStorage('/var/ko_flow/storage/github');
 
-        $prs = $prRepo->getPullRequestsForPage(30);
-        $prStorage->storePrs($prs);
+        $backuper = new \KoFlow\GitHub\Backuper($prRepo, $prStorage);
+        $backuper->backup();
 
         exit(0);
     }
+
+    if ($analyzeGitHub === true) {
+        $path = '/var/ko_flow/storage/github/20191111_113654/';
+        $localGitHubCache = new \KoFlow\GitHub\LocalGitHubCache($path);
+        $fileList = $localGitHubCache->getListOfFiles();
+        $githubFlowAnalyzer = new \KoFlow\GitHub\GitHubFlowAnalyzer($localGitHubCache);
+        $csvFile = $githubFlowAnalyzer->iterate($fileList);
+        file_put_contents('/var/ko_flow/storage/flow.csv', $csvFile);
+    }
+
 
 } catch (\Throwable $e) {
     echo (string) $e;

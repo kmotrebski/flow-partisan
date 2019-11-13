@@ -47,4 +47,124 @@ class Pr implements \JsonSerializable
     {
         return $this->payload->githubPr->number;
     }
+
+    private function getMergedAt()
+    {
+        return $this->payload->githubPr->merged_at;
+    }
+
+    private function getCreatedAt()
+    {
+        return $this->payload->githubPr->created_at;
+    }
+
+    public function isMerged(): bool
+    {
+        $merged_at = $this->getMergedAt();
+        if ($merged_at === null) {
+            return  false;
+        }
+
+        if (is_string($merged_at)) {
+            return true;
+        }
+
+        throw new \RuntimeException();
+    }
+
+    public function isCodeReviewed(): bool
+    {
+        $labels = $this->getLabels();
+        return in_array('reviewed', $labels, true);
+    }
+
+    public function getCodeReviewDate(): \DateTimeImmutable
+    {
+        if ($this->isCodeReviewed() === false) {
+            $msg = 'It is not code reviewed!';
+            throw new \RuntimeException($msg);
+        }
+
+
+        $latestDate = null;
+
+        $events = $this->payload->githubEvents;
+
+        foreach ($events as $event) {
+
+            if ($event->event !== 'labeled') {
+                continue;
+            }
+
+            if ($event->label->name !== 'reviewed') {
+                continue;
+            }
+
+            $date = self::getDateTime($event->created_at);
+
+            if ($latestDate === null) {
+                $latestDate = $date;
+            }
+
+            if ($latestDate < $date) {
+                $latestDate = $date;
+            }
+        }
+
+        if ($latestDate === null) {
+            throw new \Exception('No date found!');
+        }
+
+        return $latestDate;
+    }
+
+    private function getLabels(): array
+    {
+        $labels = [];
+        $labelsArray = $this->payload->githubPr->labels;
+
+        foreach ($labelsArray as $githubLabel) {
+            $labels[] = $githubLabel->name;
+        }
+
+        return $labels;
+    }
+
+    public function isGoodForFlow(): bool
+    {
+        if ($this->isMerged() === false) {
+            return false;
+        }
+
+        if ($this->isCodeReviewed() === false) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getFlowEntry(): FlowEntry
+    {
+        $merged_at = $this->getMergedAt();
+        $created_at = $this->getCreatedAt();
+
+        $createdAt = self::getDateTime($created_at);
+        $mergedAt = self::getDateTime($merged_at);
+        $codeReviewDate = $this->getCodeReviewDate();
+
+        return new FlowEntry(
+            $this->getNumber(),
+            $createdAt,
+            $mergedAt,
+            $codeReviewDate
+        );
+    }
+
+    private static function getDateTime(string $asString): \DateTimeImmutable
+    {
+        $utc = new \DateTimeZone('UTC');
+        $mergedAt = \DateTimeImmutable::createFromFormat(DATE_ISO8601, $asString, $utc);
+        $mergedAt = $mergedAt->setTimezone($utc);
+        return $mergedAt;
+    }
 }
