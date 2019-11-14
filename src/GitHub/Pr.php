@@ -18,7 +18,8 @@ class Pr implements \JsonSerializable
 
     public static function constructFromGitHubParts(
         array $githubPr,
-        array $githubEvents
+        array $githubEvents,
+        array $githubReviews
     ): self {
 
         $githubPrCloned = self::getClone($githubPr);
@@ -27,6 +28,7 @@ class Pr implements \JsonSerializable
         $payload = (object) [];
         $payload->githubPr = $githubPrCloned;
         $payload->githubEvents = $githubEventsCloned;
+        $payload->githubReviews = $githubReviews;
 
         return new self($payload);
     }

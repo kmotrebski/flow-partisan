@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace KoFlow\GitHub;
 
+use Github\HttpClient\Message\ResponseMediator;
+
 class GitHubPrRepository
 {
     /**
@@ -71,8 +73,13 @@ class GitHubPrRepository
         foreach ($rawPrs as $pullRequest) {
             $number = $pullRequest['number'];
             $events = $this->getEventsForIssue($number);
+            $reviews = $this->getReviews($number);
 
-            $output[] = Pr::constructFromGitHubParts($pullRequest, $events);
+            $output[] = Pr::constructFromGitHubParts(
+                $pullRequest,
+                $events,
+                $reviews
+            );
         }
 
         return $output;
@@ -116,6 +123,17 @@ class GitHubPrRepository
         );
 
         return $eventsPaginated;
+    }
+
+    private function getReviews(int $number): array
+    {
+        $urlFmt = '/repos/%s/%s/pulls/%s/reviews';
+        $url = sprintf($urlFmt, $this->userOrOrg, $this->repositoryName, $number);
+
+        $response = $this->client->getHttpClient()->get($url);
+        $data = ResponseMediator::getContent($response);
+
+        return $data;
     }
 
     public function getQuota(): \stdClass
