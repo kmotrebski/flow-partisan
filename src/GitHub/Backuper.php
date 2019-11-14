@@ -40,6 +40,9 @@ class Backuper
 
             $this->localStorage->storePrs($prs);
 
+            $lastPr = $this->localStorage->getLastPrStored();
+            $this->outputProgress($page, $lastPr);
+
             $page++;
 
             $this->outputQuota();
@@ -48,6 +51,13 @@ class Backuper
                 return;
             }
         }
+    }
+
+    private function outputProgress(int $page, int $lastPr): void
+    {
+        $fmt = "Finished page %s, last PR=%s." . PHP_EOL;
+        $msg = sprintf($fmt, $page, $lastPr);
+        echo $msg;
     }
 
     private function waitForQuota(): void

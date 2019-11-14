@@ -16,6 +16,11 @@ class LocalStorage
      */
     private $storingTime;
 
+    /**
+     * @var int|null $lastPrStored
+     */
+    private $lastPrStored;
+
     public function __construct(
         string $baseDir
     ) {
@@ -23,6 +28,8 @@ class LocalStorage
 
         $utc = new \DateTimeZone('UTC');
         $this->storingTime = new \DateTimeImmutable('now', $utc);
+
+        $this->lastPrStored = null;
     }
 
     private static function createDir(string $dir): void
@@ -46,6 +53,10 @@ class LocalStorage
 
     public function storePrs(array $prs)
     {
+        if (count($prs) === 0) {
+            throw new \RuntimeException('No PRs');
+        }
+
         foreach ($prs as $pr) {
             $this->storePr($pr);
         }
@@ -60,6 +71,8 @@ class LocalStorage
         $asJson = json_encode($pr, JSON_PRETTY_PRINT);
 
         $finalPath = sprintf('%s/%s.json', $finalDir, $pr->getNumber());
+
+        $this->lastPrStored = $pr->getNumber();
 
         self::saveOnDisk($finalPath, $asJson);
     }
@@ -89,5 +102,17 @@ class LocalStorage
         $subdir = $time->format('Ymd_His');
         $finalDir = sprintf('%s/%s', $baseDir, $subdir);
         return $finalDir;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastPrStored(): int
+    {
+        if ($this->lastPrStored === null) {
+            throw new \RuntimeException('Nothing stored!');
+        }
+
+        return $this->lastPrStored;
     }
 }
