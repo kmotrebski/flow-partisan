@@ -158,8 +158,14 @@ class Pr implements \JsonSerializable
             $this->getNumber(),
             $createdAt,
             $mergedAt,
-            $codeReviewDate
+            $codeReviewDate,
+            $this->getUsername()
         );
+    }
+
+    private function getUsername(): string
+    {
+        return $this->payload->githubPr->user->login;
     }
 
     private static function getDateTime(string $asString): \DateTimeImmutable

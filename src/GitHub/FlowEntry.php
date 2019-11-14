@@ -26,23 +26,29 @@ class FlowEntry
      */
     private $reviewedAt;
 
+    /**
+     * @var string $username
+     */
+    private $username;
+
     public function __construct(
         int $id,
         \DateTimeImmutable $createdAt,
         \DateTimeImmutable $mergedAt,
-        \DateTimeImmutable $reviewedAt
+        \DateTimeImmutable $reviewedAt,
+        string $username
     ) {
         $this->id = $id;
         $this->createdAt = $createdAt;
         $this->mergedAt = $mergedAt;
         $this->reviewedAt = $reviewedAt;
+        $this->username = $username;
     }
 
     public static function getHeader(): string
     {
-        return 'id,created_at,merged_at,reviewedAt,sec_from_created_to_merged,sec_from_merged_to_reviewed';
+        return 'id,created_at,merged_at,reviewedAt,sec_from_created_to_merged,sec_from_merged_to_reviewed,username';
     }
-
 
     public function intoString(): string
     {
@@ -60,6 +66,7 @@ class FlowEntry
             $this->reviewedAt->format('Y-m-d H:i:s'),
             $sec_from_created_to_merged,
             $sec_from_merged_to_reviewed,
+            $this->username,
         ];
 
         return implode(',', $array);
