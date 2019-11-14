@@ -7,6 +7,7 @@ set_error_handler(function ($severity, $message, $file, $line) {
 $importJira = false;
 $importGithub = false;
 $analyzeGitHub = false;
+$analyzePath = '/non_existing';
 
 $githubToken = null;
 $githubUser = null;
@@ -51,8 +52,7 @@ try {
     }
 
     if ($analyzeGitHub === true) {
-        $path = '/var/ko_flow/storage/github/20191111_113654/';
-        $localGitHubCache = new \KoFlow\GitHub\LocalGitHubCache($path);
+        $localGitHubCache = new \KoFlow\GitHub\LocalGitHubCache($analyzePath);
         $fileList = $localGitHubCache->getListOfFiles();
         $githubFlowAnalyzer = new \KoFlow\GitHub\GitHubFlowAnalyzer($localGitHubCache);
         $csvFile = $githubFlowAnalyzer->iterate($fileList);

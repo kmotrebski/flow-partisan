@@ -13,3 +13,4 @@ $githubRepository = 'repository_name';
 $importJira = false;
 $importGithub = false;
 $analyzeGitHub = false;
+$analyzePath = '';
