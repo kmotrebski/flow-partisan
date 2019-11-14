@@ -30,6 +30,8 @@ class Backuper
 
         while (true) {
 
+            $this->waitForQuota();
+
             $prs = $this->githubRepository->getPullRequestsForPage($page);
 
             if (count($prs) === 0) {
@@ -48,10 +50,31 @@ class Backuper
         }
     }
 
-    private function outputQuota(): void
+    private function waitForQuota(): void
+    {
+        $minAcceptedToContinue = 500;
+
+        while (true) {
+
+            $quota = $this->githubRepository->getQuota();
+            $remaining = $quota->remaining;
+
+            if ($remaining >= $minAcceptedToContinue) {
+                return;
+            }
+
+            $this->outputQuota('Waiting for quota');
+            sleep(5);
+        }
+
+    }
+
+    private function outputQuota(string $msg = 'Quota'): void
     {
         $quota = $this->githubRepository->getQuota();
         $asJson = json_encode($quota);
-        echo $asJson . PHP_EOL;
+        $fmt = '%s: %s' . PHP_EOL;
+        $msg = sprintf($fmt, $msg, $asJson);
+        echo $msg;
     }
 }
