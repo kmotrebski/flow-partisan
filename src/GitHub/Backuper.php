@@ -74,7 +74,7 @@ class Backuper
             }
 
             $this->outputQuota('Waiting for quota');
-            sleep(5);
+            sleep(60);
         }
 
     }
